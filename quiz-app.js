@@ -121,9 +121,15 @@
     {bg:'#faf5ff',border:'#a855f7',hover:'#f3e8ff'},
   ];
 
-  let quiz=null, qIdx=0, scores=[0,0,0,0], answered=false;
+  const WP_URL='https://billionairepitclub.wordpress.com/tests/';
 
   function pick(){
+    // Support deep linking via hash: #personality-type, #horoscope-2026, etc.
+    const hash=location.hash.replace('#','');
+    if(hash){
+      const found=quizzes.find(q=>q.id===hash);
+      if(found) return found;
+    }
     const taken=JSON.parse(localStorage.getItem('st_v3')||'{}');
     const pool=quizzes.filter(q=>!taken[q.id]);
     return (pool.length?pool:quizzes)[Math.floor(Math.random()*(pool.length||quizzes.length))];
@@ -198,12 +204,12 @@
             <div style="font-size:.85em;font-weight:700;opacity:.7;margin-bottom:14px">Share your result ✨</div>
             <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center" id="share-btns"></div>
           </div>
-          <button class="fade-up" style="animation-delay:.5s;background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.25);color:#fff;padding:15px 34px;border-radius:30px;font-size:1em;font-weight:800;cursor:pointer;margin-top:24px;transition:all .2s;backdrop-filter:blur(8px);font-family:inherit" onmouseover="this.style.background='rgba(255,255,255,.28)';this.style.transform='translateY(-2px)'" onmouseout="this.style.background='rgba(255,255,255,.15)';this.style.transform='none'" onclick="window.__next()">Take Another Test ✨</button>
+          <button class="fade-up" style="animation-delay:.5s;background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.25);color:#fff;padding:15px 34px;border-radius:30px;font-size:1em;font-weight:800;cursor:pointer;margin-top:24px;transition:all .2s;backdrop-filter:blur(8px);font-family:inherit" onmouseover="this.style.background='rgba(255,255,255,.28)';this.style.transform='translateY(-2px)'" onmouseout="this.style.background='rgba(255,255,255,.15)';this.style.transform='none'" onclick="location.href=WP_URL">Take Another Test ✨</button>
         </div>
         <div style="max-width:480px;padding:0 20px 48px;margin:0 auto">
           <div style="text-align:center;font-size:.8em;font-weight:700;opacity:.5;margin-bottom:14px;letter-spacing:1px;text-transform:uppercase">More tests you'll love</div>
           ${others.map((q,i)=>`
-            <div class="fade-up" style="animation-delay:${.55+i*.1}s;background:${q.gradient};border-radius:18px;padding:18px 20px;cursor:pointer;display:flex;align-items:center;gap:14px;margin-bottom:10px;transition:transform .2s,box-shadow .2s;color:#fff" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 24px rgba(0,0,0,.2)'" onmouseout="this.style.transform='none';this.style.boxShadow='none'" onclick="window.__start(${quizzes.indexOf(q)})">
+            <div class="fade-up" style="animation-delay:${.55+i*.1}s;background:${q.gradient};border-radius:18px;padding:18px 20px;cursor:pointer;display:flex;align-items:center;gap:14px;margin-bottom:10px;transition:transform .2s,box-shadow .2s;color:#fff" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 24px rgba(0,0,0,.2)'" onmouseout="this.style.transform='none';this.style.boxShadow='none'" onclick="location.href=WP_URL">
               <div style="font-size:2.2em">${q.emoji}</div>
               <div style="flex:1;font-size:.95em;font-weight:700;line-height:1.3">${q.title}</div>
               <div style="font-size:.82em;font-weight:700;opacity:.65">Start →</div>
@@ -246,7 +252,6 @@
   window.__next=function(){quiz=pick();qIdx=0;scores=[0,0,0,0];render();window.scrollTo(0,0)};
   window.__start=function(i){quiz=quizzes[i];qIdx=0;scores=[0,0,0,0];render();window.scrollTo(0,0)};
 
-  // Auto-start
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init);
-  else init();
+  // Auto-start immediately — no delay
+  init();
 })();
