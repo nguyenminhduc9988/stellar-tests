@@ -354,10 +354,19 @@
   // Expose
   window._stellar = { start, answer, back, home, shareWhatsApp, shareTwitter, shareFacebook, copyResult, shareSite };
 
-  // Init
+  // Init - support deep linking via window._stellar_quiz
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', render);
+    document.addEventListener('DOMContentLoaded', init);
   } else {
-    render();
+    init();
+  }
+
+  function init() {
+    if (window._stellar_quiz) {
+      const idx = quizzes.findIndex(q => q.id === window._stellar_quiz);
+      if (idx >= 0) start(idx);
+    } else {
+      render();
+    }
   }
 })();
